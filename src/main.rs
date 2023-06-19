@@ -36,7 +36,7 @@ enum TokenError {
 impl Display for TokenError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            TokenError::InvalidCharacter(index, ch) => write!(f, "Invalid character at position {}, \"{}\"", index, ch),
+            TokenError::InvalidCharacter(index, ch) => write!(f, "Invalid character at position {}, \"{}\"", index + 1, ch),
         }
     }
 }
@@ -46,14 +46,16 @@ impl Error for TokenError {}
 #[derive(Debug, PartialEq, Eq)]
 enum CalculationError {
    NoNumberFoundForOperation(usize, OperationType),
-   CalculationError(&'static str)
+   NoResultAvailable(&'static str),
+   IncompleteExpression(usize)
 }
 
 impl Display for CalculationError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CalculationError::NoNumberFoundForOperation(pos, op) => write!(f, "No number found before the operation {} at position {}", op, pos),
-            CalculationError::CalculationError(error_msg) => write!(f, "{}", error_msg)
+            CalculationError::NoNumberFoundForOperation(pos, op) => write!(f, "No number found before the operation {} at position {}", op, pos + 1),
+            CalculationError::NoResultAvailable(error_msg) => write!(f, "{}", error_msg),
+            CalculationError::IncompleteExpression(stack_size) => write!(f, "Incomplete expression. {} tokens unprocessed.", stack_size - 1)
         }
     }
 }
@@ -104,9 +106,13 @@ fn calculate_rpd(tokens: Vec<(usize, PolishNotationToken)>) -> Result<u32, Calcu
         } 
     }
 
+    if stack.len() > 1 {
+        return Err(CalculationError::IncompleteExpression(stack.len()));
+    }
+
     stack
         .pop_back()
-        .ok_or_else(|| CalculationError::CalculationError("No result can be generated."))
+        .ok_or_else(|| CalculationError::NoResultAvailable("No result can be generated."))
 }
 
 fn apply_op(op_pos: usize, op_type: OperationType, stack: &mut VecDeque<u32>) -> Result<(), CalculationError> {
@@ -143,6 +149,7 @@ fn parse_rpd_token(index: usize, ch: char) -> Result<(usize, PolishNotationToken
         '+' => Ok((index, PolishNotationToken::Operation(OperationType::ADDITION))),
         '-' => Ok((index, PolishNotationToken::Operation(OperationType::SUBTRACTION))),
         '*' => Ok((index, PolishNotationToken::Operation(OperationType::MULTIPLICATION))),
+        'x' => Ok((index, PolishNotationToken::Operation(OperationType::MULTIPLICATION))),
         '/' => Ok((index, PolishNotationToken::Operation(OperationType::DIVISION))),
         '0' ..= '9' => Ok((index, PolishNotationToken::Number(ch.to_digit(10).unwrap()))),
         ' ' => Ok((index, PolishNotationToken::Space)),

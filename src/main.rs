@@ -150,6 +150,7 @@ fn parse_rpd_token(index: usize, ch: char) -> Result<(usize, PolishNotationToken
         '-' => Ok((index, PolishNotationToken::Operation(OperationType::SUBTRACTION))),
         '*' => Ok((index, PolishNotationToken::Operation(OperationType::MULTIPLICATION))),
         'x' => Ok((index, PolishNotationToken::Operation(OperationType::MULTIPLICATION))),
+        'X' => Ok((index, PolishNotationToken::Operation(OperationType::MULTIPLICATION))),
         '/' => Ok((index, PolishNotationToken::Operation(OperationType::DIVISION))),
         '0' ..= '9' => Ok((index, PolishNotationToken::Number(ch.to_digit(10).unwrap()))),
         ' ' => Ok((index, PolishNotationToken::Space)),

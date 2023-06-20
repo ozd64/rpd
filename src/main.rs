@@ -5,19 +5,19 @@ use std::io::{self, Write};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 enum OperationType {
-    ADDITION,
-    SUBTRACTION,
-    MULTIPLICATION,
-    DIVISION,
+    Addition,
+    Subtraction,
+    Multiplication,
+    Division,
 }
 
 impl Display for OperationType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            OperationType::ADDITION => write!(f, "+"),
-            OperationType::SUBTRACTION => write!(f, "-"),
-            OperationType::MULTIPLICATION => write!(f, "*"),
-            OperationType::DIVISION => write!(f, "/"),
+            OperationType::Addition => write!(f, "+"),
+            OperationType::Subtraction => write!(f, "-"),
+            OperationType::Multiplication => write!(f, "*"),
+            OperationType::Division => write!(f, "/"),
         }
     }
 }
@@ -143,7 +143,7 @@ fn apply_op(
     stack: &mut VecDeque<u32>,
 ) -> Result<(), CalculationError> {
     match op_type {
-        OperationType::ADDITION => {
+        OperationType::Addition => {
             let y = stack
                 .pop_back()
                 .ok_or_else(|| CalculationError::NoNumberFoundForOperation(op_pos, op_type))?;
@@ -153,7 +153,7 @@ fn apply_op(
 
             Ok(stack.push_back(x + y))
         }
-        OperationType::SUBTRACTION => {
+        OperationType::Subtraction => {
             let y = stack
                 .pop_back()
                 .ok_or_else(|| CalculationError::NoNumberFoundForOperation(op_pos, op_type))?;
@@ -163,7 +163,7 @@ fn apply_op(
 
             Ok(stack.push_back(x - y))
         }
-        OperationType::MULTIPLICATION => {
+        OperationType::Multiplication => {
             let y = stack
                 .pop_back()
                 .ok_or_else(|| CalculationError::NoNumberFoundForOperation(op_pos, op_type))?;
@@ -173,7 +173,7 @@ fn apply_op(
 
             Ok(stack.push_back(x * y))
         }
-        OperationType::DIVISION => {
+        OperationType::Division => {
             let y = stack
                 .pop_back()
                 .ok_or_else(|| CalculationError::NoNumberFoundForOperation(op_pos, op_type))?;
@@ -190,27 +190,27 @@ fn parse_rpd_token(index: usize, ch: char) -> Result<(usize, PolishNotationToken
     match ch {
         '+' => Ok((
             index,
-            PolishNotationToken::Operation(OperationType::ADDITION),
+            PolishNotationToken::Operation(OperationType::Addition),
         )),
         '-' => Ok((
             index,
-            PolishNotationToken::Operation(OperationType::SUBTRACTION),
+            PolishNotationToken::Operation(OperationType::Subtraction),
         )),
         '*' => Ok((
             index,
-            PolishNotationToken::Operation(OperationType::MULTIPLICATION),
+            PolishNotationToken::Operation(OperationType::Multiplication),
         )),
         'x' => Ok((
             index,
-            PolishNotationToken::Operation(OperationType::MULTIPLICATION),
+            PolishNotationToken::Operation(OperationType::Multiplication),
         )),
         'X' => Ok((
             index,
-            PolishNotationToken::Operation(OperationType::MULTIPLICATION),
+            PolishNotationToken::Operation(OperationType::Multiplication),
         )),
         '/' => Ok((
             index,
-            PolishNotationToken::Operation(OperationType::DIVISION),
+            PolishNotationToken::Operation(OperationType::Division),
         )),
         '0'..='9' => Ok((index, PolishNotationToken::Number(ch.to_digit(10).unwrap()))),
         ' ' => Ok((index, PolishNotationToken::Space)),
